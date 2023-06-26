@@ -19,7 +19,7 @@ spec:
         subtype: go
     spec:        
       destination:
-        namespace: '{{namespace}}'
+        namespace: '{{env}}'
         server: "https://kubernetes.default.svc"
       source:
         path: user-storage
