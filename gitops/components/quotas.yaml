@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: user-storage
+  name: quotas
   namespace: openshift-gitops
 spec:
   generators:
@@ -12,9 +12,9 @@ spec:
       - env: prod
   template:
     metadata: 
-      name: '{{env}}-user-storage'
+      name: '{{env}}-quotas'
       labels: 
-        team: 'architecture'
+        team: 'platform'
         env: '{{env}}'
         type: app
         subtype: go
@@ -23,12 +23,9 @@ spec:
         namespace: '{{env}}'
         server: "https://kubernetes.default.svc"
       source:
-        path: user-storage
+        path: quotas
         repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/workshop-argocd.git"
         targetRevision: develop
-        helm:
-          valueFiles:
-            - '{{env}}.values.yaml'
       project: default
       syncPolicy:
         automated:
