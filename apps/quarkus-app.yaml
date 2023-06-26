@@ -26,8 +26,8 @@ spec:
         server: "https://kubernetes.default.svc"
       source:
         path: .
-        repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/app-quarkus-config.git"
-        targetRevision: main
+        repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/workshop-argocd.git"
+        targetRevision: develop
         helm:
           valueFiles:
             - '{{env}}.values.yaml'
