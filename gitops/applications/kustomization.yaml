@@ -1,11 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - operators.yaml
-  - security.yaml
-  - tekton-workspaces.yaml
-  - tekton-pipelines.yaml
-  - tekton-triggers.yaml
-  - tekton-tasks.yaml
-  - gogs.yaml
   - apps.yaml
