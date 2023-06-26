@@ -4,4 +4,4 @@ resources:
   - ../../base
 
 patchesStrategicMerge:
-  - pods-limit-pre-overlay.yaml
+  - pods-limit-int-overlay.yaml
