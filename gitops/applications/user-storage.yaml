@@ -22,7 +22,7 @@ spec:
         namespace: '{{namespace}}'
         server: "https://kubernetes.default.svc"
       source:
-        path: .
+        path: user-storage
         repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/workshop-argocd.git"
         targetRevision: develop
         helm:
