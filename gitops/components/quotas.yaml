@@ -23,7 +23,7 @@ spec:
         namespace: '{{env}}'
         server: "https://kubernetes.default.svc"
       source:
-        path: quotas
+        path: quotas/overlays/{{env}}
         repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/workshop-argocd.git"
         targetRevision: develop
       project: default
