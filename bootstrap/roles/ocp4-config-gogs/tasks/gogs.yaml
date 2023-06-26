@@ -1,0 +1,24 @@
+- name: Extract Gogs url
+  shell: |
+    oc get route -n gogs -o jsonpath='{.spec.host}' gogs
+  register: gogs_route
+  delay: 5
+  retries: 30
+  until:
+    - gogs_route.stdout != ""
+
+- name: Set Gogs hostname
+  ansible.builtin.set_fact:
+    gogs_hostname: "{{ gogs_route.stdout }}"
+
+- name: Create gogs admin user
+  uri:
+    url: "http://{{ gogs_hostname }}/user/sign_up"
+    method: POST
+    body: "user_name={{ gogs_username }}&password={{ gogs_password }}&&retype={{ gogs_password }}&&email={{ gogs_username }}@gogs.com"
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    status_code: 302,200
+  register: gogs_create_user_resp
+
+  

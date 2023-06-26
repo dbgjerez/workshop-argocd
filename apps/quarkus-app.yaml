@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app-quarkus
+  namespace: openshift-gitops
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+        namespace: quarkus-dev
+      - env: int
+        namespace: quarkus-int
+      - env: prod
+        namespace: quarkus-prod
+  template:
+    metadata: 
+      name: '{{env}}-quarkus-app'
+      labels: 
+        env: '{{env}}'
+        type: app
+        subtype: quarkus
+    spec:        
+      destination:
+        namespace: '{{namespace}}'
+        server: "https://kubernetes.default.svc"
+      source:
+        path: .
+        repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/app-quarkus-config.git"
+        targetRevision: main
+        helm:
+          valueFiles:
+            - '{{env}}.values.yaml'
+      project: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: false
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,4 @@
+- name: Bootstrap ArgoCD
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'argocd-app-bootstrap.yaml.j2') }}"

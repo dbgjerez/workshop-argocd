@@ -1,0 +1,3 @@
+- import_tasks: argocd.yaml
+
+- import_tasks: bootstrap.yaml

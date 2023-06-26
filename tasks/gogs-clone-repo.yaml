@@ -1,0 +1,77 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: gogs-clone-repo
+spec:
+  params:
+    - name: GOGS_USER
+      description: Gogs admin user
+      default: "gogs"
+    - name: GOGS_PASSWORD
+      description: Gogs admin password
+      default: "gogs"
+    - name: REPO_URL
+      description: Url of repo to clone, for example GitHub
+      type: string
+    - name: REPO_NAME
+      description: New name of the repo
+      type: string
+    - name: GOGS_NAMESPACE
+      description: Gogs installation namespace
+      default: "gogs"
+    - name: TEKTON_NAMESPACE
+      description: Tekton installation namespace
+      default: "tekton"
+    - name: CREATE_WEBHOOK
+      description: create a webhook
+      type: string
+      default: "true"
+  steps:
+   - name: clone-repo
+     image: quay.io/siamaksade/python-oc
+     script: |
+      #!/usr/bin/env python3
+
+      import os
+      import requests 
+
+      gogs_user = "$(params.GOGS_USER)"
+      gogs_pwd = "$(params.GOGS_PASSWORD)"
+      gogs_ns = "$(params.GOGS_NAMESPACE)"
+      tekton_ns = "$(params.TEKTON_NAMESPACE)"
+      webhookURL = "http://" + os.popen('oc get route gogs-webhook -n ' + tekton_ns + ' -o template --template="{{.spec.host}}"').read()
+      gogsURL = "http://" + os.popen('oc get svc gogs -n ' + gogs_ns + ' -o template --template="{{.spec.clusterIP}}"').read() + ":3000"
+      repo_url = "$(params.REPO_URL)"
+      repo_name = "$(params.REPO_NAME)"
+      
+      data_user = {
+      'user_name': gogs_user,
+      'password': gogs_pwd,
+      'retype': gogs_pwd,
+      'email': 'admin@gogs.com'
+      }
+
+      # create the repository
+      data_repo = '{"clone_addr": "' + repo_url + '", "uid": 1, "repo_name": "' + repo_name + '"}'
+      headers = {'Content-Type': 'application/json'}
+      resp = requests.post(url = gogsURL + "/api/v1/repos/migrate", headers = headers, auth = (gogs_user, gogs_pwd), data = data_repo)  
+      if resp.status_code != 200 and resp.status_code != 201:
+        print("Error creating git repo (status code: {})".format(resp.status_code))
+        print(resp.content)
+      else:
+        print("Created git repo " + repo_name)
+
+      # create the webhook
+      webhook = "$(params.CREATE_WEBHOOK)"
+      if webhook == 'true':
+        data_webhook = '{"type": "gogs", "config": { "url": "' + webhookURL + '", "content_type": "json"}, "events": ["push"], "active": true}'
+        headers = {'Content-Type': 'application/json'}
+        resp = requests.post(url = gogsURL + "/api/v1/repos/" + gogs_user + "/" + repo_name + "/hooks", 
+                            headers = headers, 
+                            auth = (gogs_user, gogs_pwd), 
+                            data = data_webhook) 
+        if resp.status_code != 200 and resp.status_code != 201:
+          print("Error configuring the webhook (status code: {})".format(resp.status_code))
+          print(resp.content)
+        else:
+          print("Configured webhook: " + webhookURL)

@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: init-gogs
+  namespace: tekton
+  labels:
+    app.kubernetes.io/instance: tekton-pipelines
+    tekton.dev/pipeline: init-gogs
+spec:
+  pipelineRef:
+    name: init-gogs
+  serviceAccountName: pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: git-credentials
+      secret:
+        secretName: git-credentials
+    - name: source
+      persistentVolumeClaim:
+        claimName: source-pvc

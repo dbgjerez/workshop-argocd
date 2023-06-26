@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gogs-postgresql
+  annotations:
+    image.openshift.io/triggers: >-
+        [{"from":{"kind":"ImageStreamTag","name":"postgresql:latest", "namespace":"openshift"},"fieldPath":"spec.template.spec.containers[?(@.name==\"postgresql\")].image"}]
+  labels:
+    app: gogs
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: gogs
+    app.kubernetes.io/name: gogs-postgresql
+    app.kubernetes.io/part-of: gogs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gogs
+      name: gogs-postgresql
+  template:
+    metadata:
+      labels:
+        app: gogs
+        name: gogs-postgresql
+    spec:
+      containers:
+      - name: postgresql
+        imagePullPolicy: Always
+        image: postgresql:latest
+        securityContext:
+           allowPrivilegeEscalation: false
+           runAsNonRoot: true
+           capabilities:
+             drop:
+               - ALL
+           seccompProfile:
+             type: RuntimeDefault
+        env:
+        - name: POSTGRESQL_USER
+          value: gogs
+        - name: POSTGRESQL_PASSWORD
+          value: gogs
+        - name: POSTGRESQL_DATABASE
+          value: gogs
+        - name: POSTGRESQL_MAX_CONNECTIONS
+          value: "100"
+        - name: POSTGRESQL_SHARED_BUFFERS
+          value: 12MB
+        - name: POSTGRESQL_ADMIN_PASSWORD
+          value: gogs
+        ports:
+        - containerPort: 5432
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 5432
+          timeoutSeconds: 1
+          failureThreshold: 10
+          periodSeconds: 20
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -i
+            - -c
+            - psql -h 127.0.0.1 -U ${POSTGRESQL_USER} -q -d ${POSTGRESQL_DATABASE} -c 'SELECT 1'
+        resources:
+          limits:
+            memory: 512Mi
+        volumeMounts:
+        - mountPath: /var/lib/pgsql/data
+          name: gogs-postgres-data
+      volumes:
+      - name: gogs-postgres-data
+        persistentVolumeClaim:
+          claimName: gogs-postgres-data

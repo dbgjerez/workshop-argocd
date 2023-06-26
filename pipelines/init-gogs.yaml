@@ -1,0 +1,62 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: init-gogs
+spec:
+  workspaces:
+    - name: git-credentials
+    - name: source
+  tasks:
+    - name: init-admin
+      taskRef:
+        name: gogs-init-admin
+    - name: init-quarkus-app
+      taskRef:
+        name: gogs-clone-repo
+      params: 
+        - name: REPO_URL
+          value: https://github.com/dbgjerez/workshop-tekton-argocd-app-quarkus.git
+        - name: REPO_NAME
+          value: app-quarkus
+      runAfter:
+        - init-admin
+    - name: init-quarkus-app-config
+      taskRef:
+        name: gogs-clone-repo
+      params: 
+        - name: REPO_URL
+          value: https://github.com/dbgjerez/workshop-tekton-argocd-app-quarkus-config.git
+        - name: REPO_NAME
+          value: app-quarkus-config
+        - name: CREATE_WEBHOOK
+          value: "false"
+      runAfter:
+        - init-admin
+    - name: update-values-quarkus
+      taskRef:
+        name: git-cli
+        kind: ClusterTask
+      runAfter:
+        - init-quarkus-app-config
+      params:
+        - name: GIT_USER_NAME
+          value: gogs
+        - name: GIT_USER_EMAIL
+          value: dborrego@redhat.com
+        - name: GIT_SCRIPT
+          value: |
+            FOLDER=app-quarkus-config
+            URL=http://gogs.gogs.svc.cluster.local:3000/gogs/app-quarkus-config.git
+            if [ ! -d "$FOLDER" ] ; then
+              git clone "$URL" "$FOLDER"
+            fi
+            cd $FOLDER
+            sed -i "s/quay.io\/dborrego\/workshop-tekton-argocd-app-quarkus/image-registry.openshift-image-registry.svc:5000\/tekton\/workshop-tekton-argocd-app-quarkus/g" values.yaml
+            git add values.yaml
+            git commit -m image-registry
+            git push
+      workspaces:
+        - name: source
+          workspace: source
+        - name: basic-auth
+          workspace: git-credentials

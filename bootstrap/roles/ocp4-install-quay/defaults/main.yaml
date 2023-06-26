@@ -1,0 +1,27 @@
+quay_registry_name: quay
+quay_project_name: quay
+quay_admin_username: admin
+quay_admin_email: quayadmin@redhat.com
+quay_admin_password: admin123
+quay_org_name: dborrego
+quay_robot_account: demo_robot
+quay_secret_name: quay-robot-secret
+csrf_pattern: ".*window.__token\ =\ '(.*)';.*"
+quay_repositories:
+  - app
+#Can obtain status codes from Swagger of quay route/api/v1/discovery
+quay_user_found_success_status_code: 200
+quay_org_not_found_error_code: 404
+quay_org_found_success_status_code: 200
+quay_org_created_success_status_code: 201
+quay_repo_not_found_error_code: 404
+quay_repo_found_success_status_code: 200
+quay_repo_created_success_status_code: 201
+quay_robot_not_found_error_code: 400
+quay_robot_found_success_status_code: 200
+quay_robot_created_success_status_code: 201
+quay_perm_success_status_code: 200
+secret_required_namespaces:
+  - dev
+  - pre
+  - prod

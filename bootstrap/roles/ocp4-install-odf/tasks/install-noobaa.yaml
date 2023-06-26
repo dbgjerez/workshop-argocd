@@ -1,0 +1,7 @@
+- name: Create Noobaa objects
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/noobaa.yaml.j2
+  - ./templates/noobaa-pv-backing-store.yaml.j2
