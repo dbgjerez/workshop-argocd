@@ -1,25 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: app-quarkus
+  name: user-storage
   namespace: openshift-gitops
 spec:
   generators:
   - list:
       elements:
       - env: dev
-        namespace: quarkus-dev
       - env: int
-        namespace: quarkus-int
       - env: prod
-        namespace: quarkus-prod
   template:
     metadata: 
-      name: '{{env}}-quarkus-app'
+      name: '{{env}}-user-storage'
       labels: 
         env: '{{env}}'
         type: app
-        subtype: quarkus
+        subtype: go
     spec:        
       destination:
         namespace: '{{namespace}}'

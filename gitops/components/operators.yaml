@@ -8,7 +8,7 @@ spec:
     namespace: openshift-operators
     server: "https://kubernetes.default.svc"
   source:
-    path: operator
+    path: dependencies/operator
     repoURL: "https://github.com/dbgjerez/workshop-tekton-argocd"
     targetRevision: develop
   project: default
