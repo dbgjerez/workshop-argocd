@@ -5,3 +5,4 @@ gitops_expected_crds:
   - argocds.argoproj.io
 
 bootstrap_branch: develop
+bootstrap_url: https://github.com/dbgjerez/workshop-argocd.git
