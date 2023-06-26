@@ -21,4 +21,16 @@
     status_code: 302,200
   register: gogs_create_user_resp
 
-  
+- name: Migrate repository
+  uri:
+    url: "http://{{ gogs_hostname }}/api/v1/repos/migrate"
+    method: POST
+    headers:
+      Content-Type: application/json
+    body: "{{ lookup('template', 'templates/repo.json.j2') }}"
+    body_format: json
+    user: "{{ gogs_username }}"
+    password: "{{ gogs_password }}"
+    force_basic_auth: true
+    status_code: 201
+  register: gogs_migrate_repository

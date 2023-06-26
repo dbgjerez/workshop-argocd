@@ -1,2 +1,4 @@
 gogs_username: gogs
 gogs_password: gogs
+repo_clone: https://github.com/dbgjerez/workshop-argocd.git
+repo_name: workshop-argocd
