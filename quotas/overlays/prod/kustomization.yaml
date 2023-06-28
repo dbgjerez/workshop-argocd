@@ -3,5 +3,5 @@ kind: Kustomization
 resources:
   - ../../base
 
-patchesStrategicMerge:
+patches:
   - pods-limit-prod-overlay.yaml

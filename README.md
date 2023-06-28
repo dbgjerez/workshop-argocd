@@ -1,10 +1,11 @@
 # Tools
-* OpenShift GitOps 1.8.3
+* OpenShift GitOps 1.9.0
 * Openshift 4.13
+* Gogs
 
 # Installation
 
-## ArgoCD 
+## Ansible
 
 Operator installation:
 

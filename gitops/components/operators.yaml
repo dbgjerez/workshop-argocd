@@ -9,7 +9,7 @@ spec:
     server: "https://kubernetes.default.svc"
   source:
     path: dependencies/operator
-    repoURL: "https://github.com/dbgjerez/workshop-tekton-argocd"
+    repoURL: "http://gogs.gogs.svc.cluster.local:3000/gogs/workshop-argocd.git"
     targetRevision: develop
   project: default
   syncPolicy:
